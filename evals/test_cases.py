@@ -1,7 +1,7 @@
 """
 Evaluation Test Cases: Golden Dataset for Policy Enforcer
 
-FDE-Level Concepts Demonstrated:
+Concepts Demonstrated:
 1. Diverse test cases covering edge cases
 2. Expected outputs with reasoning
 3. Categories for targeted testing

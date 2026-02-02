@@ -1,7 +1,7 @@
 """
 MCP Server: Tool Definitions for Policy Enforcer
 
-FDE-Level Concepts Demonstrated:
+Concepts Demonstrated:
 1. Proper tool naming (service_action_resource pattern)
 2. Pydantic validation with Field constraints
 3. Tool annotations (readOnlyHint, etc.)
@@ -66,7 +66,7 @@ def _level_to_category(level: int) -> str:
 
 from mcp.server.fastmcp import FastMCP
 
-# FDE Note: Server name follows convention: {service}_mcp
+# Server name follows convention: {service}_mcp
 mcp = FastMCP("policy_enforcer_mcp")
 
 
@@ -74,7 +74,7 @@ mcp = FastMCP("policy_enforcer_mcp")
 # Tool Definitions (Claude API Format)
 # =============================================================================
 
-# FDE Note: Centralized source of truth for tool schemas.
+# Centralized source of truth for tool schemas.
 # These match the @mcp.tool implementations below.
 CLAUDE_TOOLS = [
     {

@@ -1,7 +1,7 @@
 """
 Configuration and constants for the Policy Enforcer.
 
-FDE Note: Never hardcode API keys. Always use environment variables.
+Note: Never hardcode API keys. Always use environment variables.
 """
 
 import os
@@ -15,7 +15,7 @@ ANTHROPIC_API_KEY: Final[str] = os.getenv("ANTHROPIC_API_KEY", "")
 VOYAGE_API_KEY: Final[str] = os.getenv("VOYAGE_API_KEY", "")
 
 # Model selection
-# FDE Note: Use Sonnet for most tasks (cost-effective), Opus for complex reasoning
+# Note: Use Sonnet for most tasks (cost-effective), Opus for complex reasoning
 CLAUDE_MODEL: Final[str] = "claude-sonnet-4-20250514"
 CLAUDE_MODEL_FAST: Final[str] = "claude-haiku-4-20250514"  # For evals/grading
 VOYAGE_MODEL: Final[str] = "voyage-3"  # SOTA for enterprise/legal/finance
@@ -25,7 +25,7 @@ VOYAGE_MODEL: Final[str] = "voyage-3"  # SOTA for enterprise/legal/finance
 # =============================================================================
 
 # Confidence threshold for retrieval
-# FDE Note: If similarity score is below this, refuse to answer rather than hallucinate
+# Note: If similarity score is below this, refuse to answer rather than hallucinate
 RETRIEVAL_CONFIDENCE_THRESHOLD: Final[float] = 0.75
 
 # Number of chunks to retrieve

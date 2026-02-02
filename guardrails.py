@@ -1,7 +1,7 @@
 """
 Guardrails: Input Validation, Prompt Injection Defense, Output Validation
 
-FDE-Level Concepts Demonstrated:
+Concepts Demonstrated:
 1. Prompt injection detection (pattern-based + semantic)
 2. Input sanitization and length limits
 3. Output validation and structured response enforcement
@@ -33,7 +33,7 @@ class PolicyResponse(BaseModel):
     """
     Structured output schema for policy decisions.
     
-    FDE Note: By defining this schema, we can validate that Claude's
+    By defining this schema, we can validate that Claude's
     response contains all required fields and proper types.
     """
     approved: bool = Field(
@@ -73,7 +73,7 @@ class InputGuardrails:
     """
     Validate and sanitize user input before processing.
     
-    FDE-Level Design:
+    Design:
     - Pattern-based injection detection (fast, catches common attacks)
     - Length limits (prevent resource exhaustion)
     - Character sanitization (prevent encoding attacks)
@@ -164,7 +164,7 @@ class InputGuardrails:
         """
         Sanitize input while preserving legitimate content.
         
-        FDE Note: Be careful not to over-sanitize. We want to
+        Note: Be careful not to over-sanitize. We want to
         remove dangerous content without breaking normal queries.
         """
         # Strip excessive whitespace
@@ -190,7 +190,7 @@ class OutputGuardrails:
     """
     Validate Claude's output before returning to user.
     
-    FDE-Level Design:
+    Design:
     - Schema validation (ensure structured output)
     - Content safety checks
     - Confidence thresholding
@@ -238,7 +238,7 @@ class OutputGuardrails:
         """
         Check for potential PII in output.
         
-        FDE Note: In production, use a proper PII detection library
+        Note: In production, use a proper PII detection library
         like Microsoft Presidio. This is a basic implementation.
         
         Returns:
@@ -279,7 +279,7 @@ def should_escalate(
     """
     Determine if a decision should be escalated to human review.
     
-    FDE Note: This is critical for enterprise deployments. We need
+    Note: This is critical for enterprise deployments. We need
     to know when the AI is uncertain and should defer to humans.
     
     Args:

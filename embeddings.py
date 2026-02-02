@@ -1,7 +1,7 @@
 """
 RAG Implementation: Embeddings and Retrieval
 
-FDE-Level Concepts Demonstrated:
+Concepts Demonstrated:
 1. Embedding model selection (Voyage vs OpenAI tradeoffs)
 2. Input type distinction (document vs query)
 3. Confidence thresholding (refuse rather than hallucinate)
@@ -55,7 +55,7 @@ class EmbeddingClient:
     """
     Client for generating embeddings.
     
-    FDE Note: We use Voyage AI because it outperforms OpenAI embeddings
+    Note: We use Voyage AI because it outperforms OpenAI embeddings
     for enterprise/legal/financial content. See their benchmarks:
     https://docs.voyageai.com/docs/embeddings
     
@@ -79,7 +79,7 @@ class EmbeddingClient:
         """
         Embed documents for indexing.
         
-        FDE Note: input_type="document" tells Voyage these are the 
+        Note: input_type="document" tells Voyage these are the
         knowledge base items, not search queries. This matters for
         asymmetric retrieval.
         """
@@ -97,7 +97,7 @@ class EmbeddingClient:
         """
         Embed a search query.
         
-        FDE Note: input_type="query" optimizes the embedding for 
+        Note: input_type="query" optimizes the embedding for
         searching against documents. Different from document embeddings.
         """
         if self._use_mock:
@@ -114,7 +114,7 @@ class EmbeddingClient:
         """
         Mock embeddings for testing without API key.
         
-        FDE Note: In production, you'd never use this. But for demos
+        Note: In production, you'd never use this. But for demos
         and local testing, it lets you validate the pipeline.
         """
         # Create deterministic embeddings based on text content
@@ -136,7 +136,7 @@ class PolicyIndex:
     """
     Vector index for policy documents.
     
-    FDE-Level Design Decisions:
+    Design Decisions:
     1. We store full metadata with each chunk (not just text)
     2. We normalize embeddings so dot product = cosine similarity
     3. We return confidence scores, not just results
@@ -170,7 +170,7 @@ class PolicyIndex:
         """
         Build the vector index.
         
-        FDE Note: In production, you'd use a proper vector DB
+        Note: In production, you'd use a proper vector DB
         (Pinecone, Weaviate, pgvector). For demos, numpy is fine.
         """
         texts = [chunk.content for chunk in self.chunks]
@@ -186,7 +186,7 @@ class PolicyIndex:
         """
         Search for relevant policy chunks.
         
-        FDE Note: We return scores with results so the caller can
+        Note: We return scores with results so the caller can
         decide whether to use them. This is critical for preventing
         hallucination - if no chunk is relevant, we should say so.
         """
@@ -219,7 +219,7 @@ class PolicyIndex:
             results: List of retrieval results
             is_confident: True if at least one result meets threshold
             
-        FDE Note: This is the function you use in production.
+        Note: This is the function you use in production.
         If is_confident is False, the agent should refuse to answer
         rather than hallucinate.
         """

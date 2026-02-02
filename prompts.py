@@ -1,7 +1,7 @@
 """
 Prompt Engineering: System Prompts and Few-Shot Examples
 
-FDE-Level Concepts Demonstrated:
+Concepts Demonstrated:
 1. Clear role and constraint definition
 2. Few-shot examples for consistent output
 3. Chain-of-thought prompting

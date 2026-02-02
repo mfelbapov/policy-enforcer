@@ -1,7 +1,7 @@
 """
 Evaluation Runner: Execute Tests and Generate Reports
 
-FDE-Level Concepts Demonstrated:
+Concepts Demonstrated:
 1. Systematic evaluation execution
 2. Progress tracking and reporting
 3. Failure analysis and categorization
@@ -64,7 +64,7 @@ class MockAgent:
     """
     Mock agent for testing the eval harness without API calls.
     
-    FDE Note: Always have a way to test your eval pipeline
+    Note: Always have a way to test your eval pipeline
     without making real API calls. This saves money and allows
     fast iteration on the eval framework itself.
     """

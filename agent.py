@@ -1,7 +1,7 @@
 """
 Agent: Main Orchestration with Streaming and Tool Use
 
-FDE-Level Concepts Demonstrated:
+Concepts Demonstrated:
 1. Tool use loop (User → Claude → Tool → Claude → Response)
 2. Streaming responses for real-time feedback
 3. Proper error handling and recovery
@@ -21,7 +21,7 @@ from prompts import SYSTEM_PROMPT, FEW_SHOT_EXAMPLES, build_messages
 from guardrails import GuardrailsPipeline, PolicyResponse, should_escalate
 from embeddings import search_policies, get_policy_index
 
-# FDE Note: Tools are now imported from mcp_server to ensure Single Source of Truth
+# Tools are now imported from mcp_server to ensure Single Source of Truth
 
 
 # =============================================================================
@@ -43,7 +43,7 @@ def execute_tool(tool_name: str, tool_input: dict) -> str:
     """
     Execute a tool and return the result.
     
-    FDE Note: In production with MCP, this would call the MCP server.
+    Note: In production with MCP, this would call the MCP server.
     For direct API usage, we execute locally.
     """
     try:
@@ -85,7 +85,7 @@ class PolicyAgent:
     """
     Main agent that orchestrates the policy enforcement workflow.
     
-    FDE-Level Features:
+    Features:
     - Tool use loop with proper state management
     - Streaming for real-time feedback
     - Guardrails integration
@@ -195,7 +195,7 @@ class PolicyAgent:
         
         Yields text chunks as they arrive, then returns final AgentResponse.
         
-        FDE Note: Streaming is critical for UX in production systems.
+        Note: Streaming is critical for UX in production systems.
         Users need feedback that the system is working, especially
         when tool calls take time.
         """

@@ -1,7 +1,7 @@
 """
 Grader: LLM-as-Judge for Evaluation
 
-FDE-Level Concepts Demonstrated:
+Concepts Demonstrated:
 1. Using a cheaper/faster model for grading
 2. Structured grading criteria
 3. Explanation extraction for debugging
@@ -75,7 +75,7 @@ class EvalGrader:
     """
     LLM-based grader for policy decisions.
     
-    FDE Note: We use Haiku (fast/cheap) for grading because:
+    Note: We use Haiku (fast/cheap) for grading because:
     1. Grading is a simpler task than generation
     2. We run many evals, cost matters
     3. Speed matters for rapid iteration
@@ -203,7 +203,7 @@ Please grade this response."""
         """
         Fallback rule-based grading.
         
-        FDE Note: Always have a fallback. LLM grading can fail,
+        Note: Always have a fallback. LLM grading can fail,
         and you don't want your eval pipeline to break.
         """
         score = 0.0
