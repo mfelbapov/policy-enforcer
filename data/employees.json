@@ -1,0 +1,40 @@
+{
+    "employees": [
+        {
+            "id": "emp001",
+            "name": "Alice Chen",
+            "email": "alice.chen@company.com",
+            "level": 5,
+            "title": "Senior Software Engineer",
+            "department": "Engineering",
+            "manager_id": "emp010"
+        },
+        {
+            "id": "emp002",
+            "name": "Bob Martinez",
+            "email": "bob.martinez@company.com",
+            "level": 9,
+            "title": "Director of Engineering",
+            "department": "Engineering",
+            "manager_id": "emp015"
+        },
+        {
+            "id": "emp003",
+            "name": "Carol Williams",
+            "email": "carol.williams@company.com",
+            "level": 11,
+            "title": "VP of Product",
+            "department": "Product",
+            "manager_id": "emp020"
+        },
+        {
+            "id": "emp004",
+            "name": "David Kim",
+            "email": "david.kim@company.com",
+            "level": 3,
+            "title": "Software Engineer",
+            "department": "Engineering",
+            "manager_id": "emp001"
+        }
+    ]
+}

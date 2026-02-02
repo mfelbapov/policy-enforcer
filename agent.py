@@ -21,95 +21,23 @@ from prompts import SYSTEM_PROMPT, FEW_SHOT_EXAMPLES, build_messages
 from guardrails import GuardrailsPipeline, PolicyResponse, should_escalate
 from embeddings import search_policies, get_policy_index
 
-# =============================================================================
-# Tool Definitions for Claude API
-# =============================================================================
-
-# FDE Note: These must match the MCP server tools exactly
-TOOLS = [
-    {
-        "name": "policy_get_employee_info",
-        "description": "Retrieve employee information including level, title, and department. Use this to determine an employee's corporate level before checking policy permissions.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "employee_id": {
-                    "type": "string",
-                    "description": "Employee ID (e.g., 'emp001', 'emp002')",
-                    "pattern": "^emp\\d{3}$"
-                },
-                "response_format": {
-                    "type": "string",
-                    "enum": ["json", "markdown"],
-                    "default": "json",
-                    "description": "Output format preference"
-                }
-            },
-            "required": ["employee_id"]
-        }
-    },
-    {
-        "name": "policy_search_manual",
-        "description": "Search the corporate policy manual for relevant sections. Returns confidence scores - if confidence is low, say 'I don't have enough information.'",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "Natural language query about company policy",
-                    "minLength": 3,
-                    "maxLength": 500
-                },
-                "max_results": {
-                    "type": "integer",
-                    "default": 3,
-                    "minimum": 1,
-                    "maximum": 10,
-                    "description": "Maximum number of policy sections to return"
-                },
-                "response_format": {
-                    "type": "string",
-                    "enum": ["json", "markdown"],
-                    "default": "json"
-                }
-            },
-            "required": ["query"]
-        }
-    },
-    {
-        "name": "policy_check_approval_threshold",
-        "description": "Determine the approval requirements for an expense based on amount and employee level.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "employee_id": {
-                    "type": "string",
-                    "description": "Employee ID requesting the expense",
-                    "pattern": "^emp\\d{3}$"
-                },
-                "amount": {
-                    "type": "number",
-                    "description": "Expense amount in USD",
-                    "minimum": 0,
-                    "maximum": 1000000
-                },
-                "expense_type": {
-                    "type": "string",
-                    "description": "Type of expense (e.g., 'travel', 'software', 'equipment')"
-                }
-            },
-            "required": ["employee_id", "amount", "expense_type"]
-        }
-    }
-]
+# FDE Note: Tools are now imported from mcp_server to ensure Single Source of Truth
 
 
 # =============================================================================
 # Tool Execution
 # =============================================================================
 
-# Import mock database from MCP server
-from mcp_server import EMPLOYEE_DATABASE
+# Import tools from MCP server
+from mcp_server import (
+    CLAUDE_TOOLS as TOOLS,  # Alias for compatibility
+    get_employee_info, 
+    search_policy_manual, 
+    check_approval_threshold,
+    GetEmployeeInput,
+    SearchPolicyInput,
+    CheckApprovalInput
+)
 
 def execute_tool(tool_name: str, tool_input: dict) -> str:
     """
@@ -118,74 +46,26 @@ def execute_tool(tool_name: str, tool_input: dict) -> str:
     FDE Note: In production with MCP, this would call the MCP server.
     For direct API usage, we execute locally.
     """
-    if tool_name == "policy_get_employee_info":
-        employee_id = tool_input.get("employee_id")
-        response_format = tool_input.get("response_format", "json")
+    try:
+        if tool_name == "policy_get_employee_info":
+            # Map input to Pydantic model
+            params = GetEmployeeInput(**tool_input)
+            # Run async tool synchronously
+            return asyncio.run(get_employee_info(params))
         
-        employee = EMPLOYEE_DATABASE.get(employee_id)
-        if not employee:
-            return json.dumps({"error": f"Employee '{employee_id}' not found"})
+        elif tool_name == "policy_search_manual":
+            params = SearchPolicyInput(**tool_input)
+            return asyncio.run(search_policy_manual(params))
         
-        if response_format == "json":
-            return json.dumps(employee, indent=2)
+        elif tool_name == "policy_check_approval_threshold":
+            params = CheckApprovalInput(**tool_input)
+            return asyncio.run(check_approval_threshold(params))
+        
         else:
-            return f"Employee: {employee['name']}, Level: {employee['level']}, Title: {employee['title']}"
-    
-    elif tool_name == "policy_search_manual":
-        query = tool_input.get("query")
-        max_results = tool_input.get("max_results", 3)
-        
-        results, is_confident = search_policies(query)
-        return json.dumps({
-            "query": query,
-            "is_confident": is_confident,
-            "results": results[:max_results]
-        }, indent=2)
-    
-    elif tool_name == "policy_check_approval_threshold":
-        employee_id = tool_input.get("employee_id")
-        amount = tool_input.get("amount")
-        expense_type = tool_input.get("expense_type")
-        
-        employee = EMPLOYEE_DATABASE.get(employee_id)
-        if not employee:
-            return json.dumps({"error": f"Employee '{employee_id}' not found"})
-        
-        # Determine approval level
-        if amount < 500:
-            required_level = "Direct Manager"
-            min_level = employee["level"] + 1
-        elif amount < 2000:
-            required_level = "Department Head"
-            min_level = 7
-        elif amount < 10000:
-            required_level = "VP"
-            min_level = 11
-        else:
-            required_level = "CFO"
-            min_level = 13
-        
-        return json.dumps({
-            "employee": {
-                "id": employee["id"],
-                "name": employee["name"],
-                "level": employee["level"]
-            },
-            "expense": {
-                "amount": amount,
-                "type": expense_type,
-                "formatted_amount": f"${amount:,.2f}"
-            },
-            "approval_requirements": {
-                "required_approver_level": required_level,
-                "minimum_approver_level_number": min_level,
-                "can_self_approve": False,
-                "reason": "Self-approval prohibited per policy approval-002"
-            }
-        }, indent=2)
-    
-    else:
-        return json.dumps({"error": f"Unknown tool: {tool_name}"})
+            return json.dumps({"error": f"Unknown tool: {tool_name}"})
+            
+    except Exception as e:
+        return json.dumps({"error": f"Tool execution failed: {str(e)}"})
 
 
 # =============================================================================

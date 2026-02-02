@@ -64,6 +64,17 @@ INJECTION_PATTERNS: Final[list[str]] = [
 ]
 
 # =============================================================================
+# Data Configuration
+# =============================================================================
+
+from pathlib import Path
+
+# Paths to data files
+DATA_DIR = Path(__file__).parent / "data"
+EMPLOYEES_FILE = DATA_DIR / "employees.json"
+RULES_FILE = DATA_DIR / "rules.json"
+
+# =============================================================================
 # Validation
 # =============================================================================
 
