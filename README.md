@@ -1,70 +1,95 @@
 # Corporate Policy Enforcer
 
-A production-ready AI system demonstrating FDE-level skills:
-- **Prompt Engineering**: System prompts, few-shot examples, chain-of-thought
-- **RAG**: Embedding-based retrieval with confidence thresholds
-- **Tool Use / MCP**: Standardized tool interfaces
-- **Evals**: Automated testing with LLM-as-judge
-- **Guardrails**: Input validation, prompt injection defense, output validation
-- **Streaming**: Real-time response streaming
-- **Structured Output**: JSON schema enforcement
+An AI agent that answers employee policy questions by retrieving relevant policies and reasoning through them — demonstrating production patterns for enterprise AI deployment.
 
-## The Problem
+**Example:** "Can I expense a first-class flight to London?"
 
-Employees ask: "Can I expense a first-class flight to London?"
+The system identifies the employee's role, retrieves relevant policy sections, reasons through the rules, and returns a structured decision.
 
-The system must:
-1. Identify the employee's role/level (Tool Use)
-2. Retrieve relevant policy sections (RAG)
-3. Reason through the policy (Prompt Engineering)
-4. Return a compliant answer (Structured Output)
-5. Never hallucinate or approve unauthorized expenses (Guardrails + Evals)
+---
+
+## Why I Built This
+
+Enterprise AI isn't just about calling an LLM. It's about building systems that are reliable, auditable, and safe. This project demonstrates the patterns that matter for production deployment:
+
+- **RAG** — Retrieve relevant context, not everything
+- **Tool Use** — Let the model call functions when it needs information
+- **Guardrails** — Validate inputs, catch prompt injection, enforce output structure
+- **Evals** — Automated testing with LLM-as-judge to catch regressions
+- **Structured Output** — JSON schema enforcement for downstream integration
+
+---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        User Question                            │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    GUARDRAILS (Input)                           │
-│  • Prompt injection detection                                   │
-│  • Input sanitization                                           │
-│  • Rate limiting                                                │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                         CLAUDE                                  │
-│  • System prompt with few-shot examples                         │
-│  • Chain-of-thought reasoning                                   │
-│  • Tool selection                                               │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-              ┌───────────────┴───────────────┐
-              ▼                               ▼
-┌──────────────────────────┐    ┌──────────────────────────┐
-│      TOOL: Employee DB    │    │      TOOL: Policy RAG    │
-│  • get_employee_level     │    │  • search_policy         │
-│  • validate permissions   │    │  • confidence scoring    │
-└──────────────────────────┘    └──────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   GUARDRAILS (Output)                           │
-│  • Response validation                                          │
-│  • Structured output enforcement                                │
-│  • Confidence thresholding                                      │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Structured Response                          │
-│  { "approved": bool, "reason": str, "policy_ref": str }         │
-└─────────────────────────────────────────────────────────────────┘
+User Question
+      │
+      ▼
+┌─────────────────────────────┐
+│   GUARDRAILS (Input)        │
+│   • Prompt injection check  │
+│   • Input sanitization      │
+└─────────────────────────────┘
+      │
+      ▼
+┌─────────────────────────────┐
+│         CLAUDE              │
+│   • System prompt           │
+│   • Few-shot examples       │
+│   • Chain-of-thought        │
+└─────────────────────────────┘
+      │
+      ├──────────────┬────────────────┐
+      ▼              ▼                ▼
+┌──────────┐  ┌─────────────┐  ┌─────────────┐
+│ Employee │  │ Policy RAG  │  │  Approval   │
+│ Lookup   │  │ Search      │  │  Threshold  │
+└──────────┘  └─────────────┘  └─────────────┘
+      │
+      ▼
+┌─────────────────────────────┐
+│   GUARDRAILS (Output)       │
+│   • Schema validation       │
+│   • Confidence threshold    │
+└─────────────────────────────┘
+      │
+      ▼
+{ "approved": bool, "reason": str, "policy_ref": str }
 ```
+
+---
+
+## Patterns Demonstrated
+
+### 1. Prompt Engineering
+- System prompt with role definition and constraints
+- Few-shot examples for consistent reasoning
+- Chain-of-thought prompting for explainable decisions
+
+### 2. RAG (Retrieval Augmented Generation)
+- Embedding-based policy retrieval
+- Confidence scoring on retrieved chunks
+- Context window management
+
+### 3. Tool Use / MCP
+- Standardized tool interfaces via MCP server
+- Employee database lookup
+- Policy search function
+- Approval threshold checking
+
+### 4. Guardrails
+- Input validation and sanitization
+- Prompt injection detection
+- Output schema enforcement
+- Confidence thresholds for human escalation
+
+### 5. Evals
+- Golden test cases with expected outcomes
+- LLM-as-judge grading for nuanced responses
+- Regression testing for prompt changes
+
+---
 
 ## Project Structure
 
@@ -73,19 +98,25 @@ policy-enforcer/
 ├── README.md
 ├── requirements.txt
 ├── config.py                 # Configuration and constants
-├── embeddings.py             # RAG: Vector embeddings and retrieval
-├── mcp_server.py             # MCP: Tool definitions
+├── embeddings.py             # Vector embeddings and retrieval
+├── mcp_server.py             # Tool definitions (MCP pattern)
 ├── guardrails.py             # Input/output validation
 ├── prompts.py                # System prompts and few-shot examples
-├── agent.py                  # Main orchestration loop
-├── streaming.py              # Streaming response handler
+├── agent.py                  # Main orchestration
 ├── evals/
+│   ├── __init__.py
 │   ├── test_cases.py         # Golden test cases
 │   ├── run_evals.py          # Evaluation harness
-│   └── grader.py             # LLM-as-judge grader
-└── data/
-    └── policies.json         # Policy document corpus
+│   └── grader.py             # LLM-as-judge implementation
+├── data/
+│   ├── policies.json         # Policy corpus
+│   ├── employees.json        # Employee database
+│   └── rules.json            # Approval rules
+└── docs/
+    └── ARCHITECTURE.md       # Detailed design decisions
 ```
+
+---
 
 ## Quick Start
 
@@ -102,3 +133,62 @@ python agent.py
 # Run evaluations
 python evals/run_evals.py
 ```
+
+---
+
+## Example Interaction
+
+```
+Employee: Can I book a business class flight to Tokyo for the client meeting?
+
+Agent reasoning:
+1. Looking up employee level... → Senior Consultant
+2. Searching policies for "flight class international"...
+3. Found: "Business class permitted for flights >6 hours for Senior+ levels"
+4. Tokyo flight from US is ~13 hours ✓
+5. Employee level is Senior ✓
+
+Response:
+{
+  "approved": true,
+  "reason": "Business class is permitted for international flights over 6 hours for Senior Consultant level and above.",
+  "policy_ref": "travel-policy-4.2.1",
+  "confidence": 0.95
+}
+```
+
+---
+
+## Design Decisions
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed documentation on:
+- Why confidence thresholds matter for enterprise deployment
+- How the guardrails layer prevents prompt injection
+- Trade-offs in RAG chunk size and retrieval count
+- The eval framework and why LLM-as-judge works here
+
+---
+
+## What This Isn't
+
+This is a **demonstration prototype**, not production software. It shows the patterns, not a deployable product. In production you'd need:
+- Real policy corpus and employee database
+- Authentication and authorization
+- Audit logging
+- Human-in-the-loop for low-confidence decisions
+- Monitoring and observability
+
+---
+
+## Built With
+
+- Python 3.11+
+- Anthropic Claude API
+- Vector embeddings for RAG
+
+---
+
+## Author
+
+Milorad Felbapov
+[LinkedIn](https://linkedin.com/in/mfelbapov) | [GitHub](https://github.com/mfelbapov)

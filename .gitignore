@@ -1,3 +1,7 @@
 __pycache__/
 .idea/
 CLEANUP_PROMPT.md
+.venv/
+.env
+*.pyc
+eval_report.json
