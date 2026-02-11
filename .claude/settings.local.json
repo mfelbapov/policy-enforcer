@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__getDiagnostics",
+      "Bash(git rm:*)",
+      "Bash(xxd:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nGeneralize vendor-specific names to purpose-based names\n\nReplace Anthropic/Voyage/Claude-specific API key fields, config\nconstants, and references with generic equivalents describing their\nfunction \\(LLM_API_KEY, EMBEDDINGS_API_KEY, LLM_MODEL, etc.\\).\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)"
+    ]
+  }
+}

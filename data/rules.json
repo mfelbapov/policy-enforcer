@@ -1,0 +1,29 @@
+{
+    "approval_rules": {
+        "thresholds": [
+            {
+                "amount_limit": 500,
+                "role": "Direct Manager",
+                "min_level_offset": 1
+            },
+            {
+                "amount_limit": 2000,
+                "role": "Department Head",
+                "min_level_absolute": 7
+            },
+            {
+                "amount_limit": 10000,
+                "role": "VP",
+                "min_level_absolute": 11
+            }
+        ],
+        "default_threshold": {
+            "role": "CFO",
+            "min_level_absolute": 13
+        },
+        "general": {
+            "self_approval_allowed": false,
+            "reason_self_approval": "Self-approval prohibited per policy approval-002"
+        }
+    }
+}
